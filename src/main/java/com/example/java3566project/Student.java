@@ -19,6 +19,20 @@ public class Student {
     private String postal;
     private String phone;
 
+    public Student(String firstName, String lastName, String email, String address, String city, String postal, String phone) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.address = address;
+        this.city = city;
+        this.postal = postal;
+        this.phone = phone;
+    }
+
+    public Student(){
+
+    }
+
     public Integer getStudentId() {
         return studentId;
     }
