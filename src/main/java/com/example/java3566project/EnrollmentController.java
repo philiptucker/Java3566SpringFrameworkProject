@@ -15,23 +15,17 @@ public class EnrollmentController {
     private StudentRepository StudentRepository;
 
     @PostMapping(path="/add")
-    public @ResponseBody String addNewEnrollment (@RequestParam Integer courseId
-            , @RequestParam Integer studentId) {
-        Course c =  CourseRepository.findCourseByCourseId(courseId);
+    public @ResponseBody Enrollment addNewEnrollment (@RequestBody Enrollment enrollment) {
+        Course c =  CourseRepository.findCourseByCourseId(enrollment.getCourseId());
         if (c != null) {
-            Student s = StudentRepository.findStudentByStudentId(studentId);
+            Student s = StudentRepository.findStudentByStudentId(enrollment.getStudentId());
             if (s != null){
-                Enrollment n = new Enrollment();
-                n.setCourseId(courseId);
-                n.setStudentId(studentId);
-                EnrollmentRepository.save(n);
-                return "New Enrollment: " + s.getFirstName() + " " + s.getLastName() +
-                        " has been enrolled into " + c.getCourseName();
+                return EnrollmentRepository.save(enrollment);
             } else {
-                return "StudentId: " + studentId + " is not in our system";
+                return null;
             }
         } else {
-            return "CourseId: " + courseId + " is not in our system";
+            return null;
         }
     }
 
@@ -46,26 +40,25 @@ public class EnrollmentController {
     }
 
     @PutMapping(path="/modify/{id}")
-    public @ResponseBody String updateEnrollment(@PathVariable Integer id
-            , @RequestParam Integer courseId, @RequestParam Integer studentId){
-        Course c =  CourseRepository.findCourseByCourseId(courseId);
-        Student s = StudentRepository.findStudentByStudentId(studentId);
+    public @ResponseBody Enrollment updateEnrollment(@PathVariable Integer id
+            , @RequestBody Enrollment enrollment){
+        Course c =  CourseRepository.findCourseByCourseId(enrollment.getCourseId());
+        Student s = StudentRepository.findStudentByStudentId(enrollment.getStudentId());
         if (c != null) {
             if (s != null){
                 Enrollment n =  EnrollmentRepository.findEnrollmentByEid(id);
                 if (n != null) {
                     n.setCourseId(c.getCourseId());
                     n.setStudentId(s.getStudentId());
-                    EnrollmentRepository.save(n);
-                    return "eid: " + id + " has been updated";
+                    return EnrollmentRepository.save(n);
                 } else {
-                    return "eid: " + id + " is not in our system";
+                    return  EnrollmentRepository.findEnrollmentByEid(id);
                 }
             } else {
-                return "StudentId: " + studentId + " is not in our system";
+                return null;
             }
         } else {
-            return "CourseId: " + courseId + " is not in our system";
+            return null;
         }
     }
 

@@ -15,24 +15,17 @@ public class GradesController {
     private StudentRepository StudentRepository;
 
     @PostMapping(path="/add")
-    public @ResponseBody String addNewGrades (@RequestParam Integer courseId
-            , @RequestParam Integer studentId, @RequestParam Double grade) {
-        Course c =  CourseRepository.findCourseByCourseId(courseId);
+    public @ResponseBody Grades addNewGrades (@RequestBody Grades grade) {
+        Course c =  CourseRepository.findCourseByCourseId(grade.getCourseId());
         if (c != null) {
-            Student s = StudentRepository.findStudentByStudentId(studentId);
+            Student s = StudentRepository.findStudentByStudentId(grade.getStudentId());
             if (s != null){
-                Grades n = new Grades();
-                n.setCourseId(courseId);
-                n.setStudentId(studentId);
-                n.setGrade(grade);
-                GradesRepository.save(n);
-                return "New Grades: " + s.getFirstName() + " " + s.getLastName() +
-                        " has been graded " + grade + "% in " + c.getCourseName();
+                return GradesRepository.save(grade);
             } else {
-                return "StudentId: " + studentId + " is not in our system";
+                return null;
             }
         } else {
-            return "CourseId: " + courseId + " is not in our system";
+            return null;
         }
     }
 
@@ -47,28 +40,28 @@ public class GradesController {
     }
 
     @PutMapping(path="/modify/{id}")
-    public @ResponseBody String updateEnrollment(@PathVariable Integer id
-            , @RequestParam Integer courseId, @RequestParam Integer studentId
-            , @RequestParam Double grade){
-        Course c =  CourseRepository.findCourseByCourseId(courseId);
-        Student s = StudentRepository.findStudentByStudentId(studentId);
+    public @ResponseBody Grades updateEnrollment(@PathVariable Integer id
+            , @RequestBody Grades grade){
+        Course c =  CourseRepository.findCourseByCourseId(grade.getCourseId());
+        Student s = StudentRepository.findStudentByStudentId(grade.getStudentId());
         if (c != null) {
             if (s != null){
                 Grades n =  GradesRepository.findGradesByGid(id);
                 if (n != null) {
-                    n.setCourseId(c.getCourseId());
-                    n.setStudentId(s.getStudentId());
-                    n.setGrade(grade);
-                    GradesRepository.save(n);
-                    return "gid: " + id + " has been updated";
+                    if (grade.getGrade() != null){
+                        n.setCourseId(c.getCourseId());
+                        n.setStudentId(s.getStudentId());
+                        n.setGrade(grade.getGrade());
+                    }
+                    return GradesRepository.save(n);
                 } else {
-                    return "gid: " + id + " is not in our system";
+                    return GradesRepository.findGradesByGid(id);
                 }
             } else {
-                return "StudentId: " + studentId + " is not in our system";
+                return null;
             }
         } else {
-            return "CourseId: " + courseId + " is not in our system";
+            return null;
         }
     }
 

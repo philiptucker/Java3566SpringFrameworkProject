@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Controller
 @RequestMapping(path="/programs")
 public class ProgramsController {
@@ -13,14 +11,8 @@ public class ProgramsController {
     public ProgramsRepository ProgramsRepository;
 
     @PostMapping(path="/add")
-    public @ResponseBody String addNewProgram (@RequestParam String programName
-            , @RequestParam String campus) {
-
-        Programs n = new Programs();
-        n.setProgramName(programName);
-        n.setCampus(campus);
-        ProgramsRepository.save(n);
-        return "New Program: " + n.getProgramName() + " has been added to the system";
+    public @ResponseBody Programs addNewProgram (@RequestBody Programs program) {
+        return ProgramsRepository.save(program);
     }
 
     @GetMapping(path="/list")
@@ -39,20 +31,19 @@ public class ProgramsController {
     }
 
     @PutMapping(path="/modify/{id}")
-    public @ResponseBody String updateProgram(@PathVariable Integer id
-            , @RequestParam Optional<String> programName, @RequestParam Optional<String> campus){
+    public @ResponseBody Programs updateProgram(@PathVariable Integer id
+            , @RequestBody Programs program){
         Programs n =  ProgramsRepository.findProgramsByPid(id);
         if (n != null) {
-            if (programName.isPresent()){
-                n.setProgramName(programName.toString().substring(9, programName.toString().length()-1));
+            if (program.getProgramName() != null){
+                n.setProgramName(program.getProgramName());
             }
-            if (campus.isPresent()){
-                n.setCampus(campus.toString().substring(9, campus.toString().length()-1));
+            if (program.getCampus() != null){
+                n.setCampus(program.getCampus());
             }
-            ProgramsRepository.save(n);
-            return "pid: " + id + " has been updated";
+            return ProgramsRepository.save(n);
         } else {
-            return "pid: " + id + " is not in our system";
+            return ProgramsRepository.findProgramsByPid(id);
         }
     }
 
